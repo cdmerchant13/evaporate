@@ -11,5 +11,5 @@ bucket_name = "evaporate-files"
 [[d1_databases]]
 binding = "D1_DB"
 database_name = "evaporate-db"
-database_id = "" # Fill this in after creating the database
+database_id = "7d50371d-14b8-456f-83cb-c289712ad117" # Fill this in after creating the database
 migrations_dir = "db/migrations"

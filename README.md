@@ -48,45 +48,24 @@ cd evaporate
 
 ### Step 2: Install All Dependencies
 
-This project is a monorepo with two sub-projects (`frontend` and `worker`). You need to install dependencies for both.
+This single command will install the dependencies for both the `frontend` and the `worker`.
 
 ```bash
-# Install dependencies for the worker
-cd worker
-npm install
-
-# Install dependencies for the frontend
-cd ../frontend
 npm install
 ```
 
-### Step 3: Run the Backend Worker
+### Step 3: Run the Development Servers
 
-The backend API (Cloudflare Worker) must be running to handle file uploads.
+This command will start both the backend worker and the frontend React app in parallel.
 
 ```bash
-# From the 'frontend' directory, go back to the 'worker' directory
-cd ../worker
-
-# Start the local development server for the worker
 npm run dev
 ```
 
-This will start a local server on `http://localhost:8787`. Leave this terminal window running.
+- The backend worker will be running on `http://localhost:8787`.
+- The frontend will open in your browser at `http://localhost:3000`.
 
-### Step 4: Run the Frontend Application
-
-Open a **new terminal window** and navigate to the `frontend` directory to start the React development server.
-
-```bash
-# Navigate to the frontend directory
-cd frontend
-
-# Start the React app
-npm start
-```
-
-This will open a new tab in your browser at `http://localhost:3000`. The frontend is configured to automatically proxy API requests to the worker running on port `8787`, so everything should work seamlessly.
+The frontend is configured to automatically proxy API requests to the worker, so everything should work seamlessly.
 
 ---
 
@@ -151,23 +130,19 @@ migrations_dir = "db/migrations"
 Now, apply the database schema to your newly created D1 database.
 
 ```bash
-# Navigate to the worker directory if you aren't already there
+# This command must be run from the worker directory
 cd worker
-
-# This command executes the .sql file in db/migrations against your D1 database
 wrangler d1 migrations apply evaporate-db
+cd ..
 ```
 
-### Step 6: Deploy the Worker
+### Step 6: Deploy the Worker and Build the Frontend
 
-With the configuration complete, deploy the backend worker.
+This command will deploy the backend worker and create a production-ready build of the frontend.
 
 ```bash
-# From the worker directory
 npm run deploy
 ```
-
-This will upload and publish your worker code.
 
 ### Step 7: Deploy the Frontend to Cloudflare Pages
 
@@ -185,4 +160,4 @@ The final step is to deploy the frontend. This is best done by connecting your G
     - **Root directory:** `frontend`
 5.  **Save and Deploy:** Click **Save and Deploy**.
 
-Cloudflare will now build and deploy your frontend. Once complete, your Evaporate application will be live on the internet! The Pages frontend will automatically be ableto communicate with your deployed worker without any extra configuration.
+Cloudflare will now build and deploy your frontend. Once complete, your Evaporate application will be live on the internet! The Pages frontend will automatically be able to communicate with your deployed worker without any extra configuration.
