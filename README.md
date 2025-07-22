@@ -109,9 +109,11 @@ wrangler d1 create evaporate-db
 
 This command will output crucial information, including the `database_id`. **Copy this ID.**
 
-### Step 4: Update `wrangler.toml`
+### Step 4: Update `wrangler.toml` for Production
 
-Open the `worker/wrangler.toml` file and paste the `database_id` you copied into the correct field.
+Open the `worker/wrangler.toml` file. For production, you need to **uncomment** the `database_id` line and paste the ID you copied in the previous step.
+
+**Note:** For local development, the `database_id` line must be commented out.
 
 ```toml
 # worker/wrangler.toml
@@ -121,7 +123,9 @@ Open the `worker/wrangler.toml` file and paste the `database_id` you copied into
 [[d1_databases]]
 binding = "D1_DB"
 database_name = "evaporate-db"
-database_id = "PASTE_YOUR_DATABASE_ID_HERE" # <--- HERE
+# For local development, database_id should be commented out.
+# For production, uncomment it and replace with your actual database_id.
+# database_id = "PASTE_YOUR_DATABASE_ID_HERE"
 migrations_dir = "db/migrations"
 ```
 
