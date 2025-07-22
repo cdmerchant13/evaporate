@@ -1,0 +1,188 @@
+# Evaporate: Serverless File Sharing
+
+Evaporate is a secure, ephemeral file sharing tool built entirely on the Cloudflare serverless ecosystem. Upload files, generate a unique link, and have them automatically "evaporate" after a set time or a single download.
+
+- **Frontend:** Cloudflare Pages (React)
+- **Backend API:** Cloudflare Workers
+- **File Storage:** Cloudflare R2
+- **Metadata Storage:** Cloudflare D1
+
+---
+
+## How It Works
+
+The application is split into two main parts:
+
+1.  **The Frontend:** A React application served by Cloudflare Pages. This is the user interface where you upload files and configure their expiration settings.
+2.  **The Backend:** A Cloudflare Worker that acts as the API. It handles the business logic:
+    - Validating and receiving file uploads.
+    - Storing the actual file in a private R2 bucket.
+    - Saving file metadata (like its name, expiration, and passphrase) in a D1 database.
+    - Serving files to users who have a valid link.
+    - Deleting files from R2 and D1 once they expire.
+
+---
+
+## Prerequisites
+
+Before you begin, ensure you have the following:
+
+1.  **Node.js and npm:** [Download and install here](https://nodejs.org/).
+2.  **A Cloudflare Account:** [Sign up for free here](https://dash.cloudflare.com/sign-up).
+3.  **Git:** [Download and install here](https://git-scm.com/).
+
+---
+
+## 1. Local Development Setup
+
+Follow these steps to get the project running on your local machine for development and testing.
+
+### Step 1: Clone the Repository
+
+First, clone this repository to your local machine and navigate into the project directory.
+
+```bash
+git clone https://github.com/your-username/evaporate.git
+cd evaporate
+```
+
+### Step 2: Install All Dependencies
+
+This project is a monorepo with two sub-projects (`frontend` and `worker`). You need to install dependencies for both.
+
+```bash
+# Install dependencies for the worker
+cd worker
+npm install
+
+# Install dependencies for the frontend
+cd ../frontend
+npm install
+```
+
+### Step 3: Run the Backend Worker
+
+The backend API (Cloudflare Worker) must be running to handle file uploads.
+
+```bash
+# From the 'frontend' directory, go back to the 'worker' directory
+cd ../worker
+
+# Start the local development server for the worker
+npm run dev
+```
+
+This will start a local server on `http://localhost:8787`. Leave this terminal window running.
+
+### Step 4: Run the Frontend Application
+
+Open a **new terminal window** and navigate to the `frontend` directory to start the React development server.
+
+```bash
+# Navigate to the frontend directory
+cd frontend
+
+# Start the React app
+npm start
+```
+
+This will open a new tab in your browser at `http://localhost:3000`. The frontend is configured to automatically proxy API requests to the worker running on port `8787`, so everything should work seamlessly.
+
+---
+
+## 2. Deployment to Cloudflare
+
+This guide will walk you through deploying Evaporate to your own Cloudflare account.
+
+### Step 1: Install and Log in to Wrangler
+
+Wrangler is the command-line tool for managing Cloudflare developer products.
+
+```bash
+# Install Wrangler globally
+npm install -g wrangler
+
+# Log in to your Cloudflare account
+wrangler login
+```
+
+This will open a browser window asking you to authorize Wrangler.
+
+### Step 2: Create the R2 Bucket
+
+R2 is Cloudflare's object storage, where the uploaded files will be stored.
+
+```bash
+# This command creates a new, private R2 bucket.
+wrangler r2 bucket create evaporate-files
+```
+
+The name `evaporate-files` is already configured in `worker/wrangler.toml`.
+
+### Step 3: Create the D1 Database
+
+D1 is Cloudflare's serverless SQL database, used here to store file metadata.
+
+```bash
+# This command creates a new D1 database.
+wrangler d1 create evaporate-db
+```
+
+This command will output crucial information, including the `database_id`. **Copy this ID.**
+
+### Step 4: Update `wrangler.toml`
+
+Open the `worker/wrangler.toml` file and paste the `database_id` you copied into the correct field.
+
+```toml
+# worker/wrangler.toml
+
+# ... other config ...
+
+[[d1_databases]]
+binding = "D1_DB"
+database_name = "evaporate-db"
+database_id = "PASTE_YOUR_DATABASE_ID_HERE" # <--- HERE
+migrations_dir = "db/migrations"
+```
+
+### Step 5: Run Database Migrations
+
+Now, apply the database schema to your newly created D1 database.
+
+```bash
+# Navigate to the worker directory if you aren't already there
+cd worker
+
+# This command executes the .sql file in db/migrations against your D1 database
+wrangler d1 migrations apply evaporate-db
+```
+
+### Step 6: Deploy the Worker
+
+With the configuration complete, deploy the backend worker.
+
+```bash
+# From the worker directory
+npm run deploy
+```
+
+This will upload and publish your worker code.
+
+### Step 7: Deploy the Frontend to Cloudflare Pages
+
+The final step is to deploy the frontend. This is best done by connecting your Git repository (GitHub, GitLab) to Cloudflare Pages.
+
+1.  **Push to GitHub:** Push the project to your own GitHub repository.
+2.  **Go to Cloudflare Pages:** In the Cloudflare dashboard, navigate to **Workers & Pages** -> **Create application** -> **Pages** -> **Connect to Git**.
+3.  **Select Your Repository:** Choose the repository you just pushed.
+4.  **Configure Build Settings:**
+    - **Project Name:** `evaporate` (or your choice)
+    - **Production Branch:** `main` (or your default branch)
+    - **Framework preset:** `Create React App`
+    - **Build command:** `npm run build`
+    - **Build output directory:** `build`
+    - **Root directory:** `frontend`
+5.  **Save and Deploy:** Click **Save and Deploy**.
+
+Cloudflare will now build and deploy your frontend. Once complete, your Evaporate application will be live on the internet! The Pages frontend will automatically be ableto communicate with your deployed worker without any extra configuration.

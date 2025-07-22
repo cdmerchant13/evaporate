@@ -1,0 +1,15 @@
+name = "evaporate-worker"
+main = "src/index.ts"
+compatibility_date = "2024-03-20"
+
+# Bind an R2 Bucket. Use 'wrangler r2 bucket create evaporate-files' to create it
+[[r2_buckets]]
+binding = "R2_BUCKET"
+bucket_name = "evaporate-files"
+
+# Bind a D1 Database. Use 'wrangler d1 create evaporate-db' to create it
+[[d1_databases]]
+binding = "D1_DB"
+database_name = "evaporate-db"
+database_id = "" # Fill this in after creating the database
+migrations_dir = "db/migrations"
