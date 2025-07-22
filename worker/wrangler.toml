@@ -11,5 +11,5 @@ bucket_name = "evaporate-files"
 [[d1_databases]]
 binding = "D1_DB"
 database_name = "evaporate-db"
-# database_id = "${D1_DATABASE_ID}"
+database_id = "${D1_DATABASE_ID}"
 migrations_dir = "db/migrations"
