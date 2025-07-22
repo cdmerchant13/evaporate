@@ -1,0 +1,25 @@
+# Dependencies
+/node_modules
+/frontend/node_modules
+/worker/node_modules
+
+# Build artifacts
+/frontend/build
+/worker/.wrangler
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE files
+.idea
+.vscode
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.sw?
+
+# Misc
+.DS_Store
