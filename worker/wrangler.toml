@@ -11,7 +11,5 @@ bucket_name = "evaporate-files"
 [[d1_databases]]
 binding = "D1_DB"
 database_name = "evaporate-db"
-# For production, uncomment the line below and replace with your actual database_id.
-# For local development (wrangler dev), keep this line commented out.
-database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE"
+# database_id = "${D1_DATABASE_ID}"
 migrations_dir = "db/migrations"

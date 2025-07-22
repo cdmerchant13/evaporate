@@ -38,7 +38,7 @@ npm install
 
 For local development, Wrangler uses a local SQLite file for the database, so the production `database_id` must be disabled.
 
-Open `worker/wrangler.toml` and ensure the `database_id` line is **commented out**:
+Open `worker/wrangler.toml` and ensure the `database_id` line is **commented out** (it should look like the example below):
 
 ```toml
 # worker/wrangler.toml
@@ -46,7 +46,7 @@ Open `worker/wrangler.toml` and ensure the `database_id` line is **commented out
 binding = "D1_DB"
 database_name = "evaporate-db"
 # For local development, the following line MUST be commented out
-# database_id = "PASTE_YOUR_D1_DATABASE_ID_HERE"
+# database_id = "${D1_DATABASE_ID}"
 migrations_dir = "db/migrations"
 ```
 
@@ -96,7 +96,7 @@ This command will output crucial information, including the `database_id`. **Cop
 Open `worker/wrangler.toml` and configure it for production:
 
 1.  **Uncomment** the `database_id` line.
-2.  Paste the `database_id` you copied from the previous step.
+2.  Set the `database_id` to use an environment variable, `D1_DATABASE_ID`. This variable will hold the actual ID of your D1 database.
 
 It should look like this:
 
@@ -106,9 +106,14 @@ It should look like this:
 binding = "D1_DB"
 database_name = "evaporate-db"
 # For production, the following line MUST be uncommented and filled
-database_id = "xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx"
+database_id = "${D1_DATABASE_ID}"
 migrations_dir = "db/migrations"
 ```
+
+**How to set `D1_DATABASE_ID`:**
+
+*   **For local testing of production configuration:** Create a `.dev.vars` file in the `worker/` directory and add `D1_DATABASE_ID="YOUR_D1_DATABASE_ID_HERE"` to it. This file is ignored by Git.
+*   **For Cloudflare Workers deployment:** Set the `D1_DATABASE_ID` environment variable in your Cloudflare Workers dashboard settings under "Settings" -> "Variables" or via `wrangler secret put D1_DATABASE_ID`.
 
 ### Step 4: Run Production Database Migrations
 
